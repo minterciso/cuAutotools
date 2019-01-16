@@ -18,7 +18,8 @@
 #ifndef __KERNEL_H
 #define __KERNEL_H
 
-void call_kernel(void);
+void call_dummy_kernel(void);
+int call_rand_kernel(void);
 void start_device(void);
 void reset_device(void);
 

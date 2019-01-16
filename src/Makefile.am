@@ -5,6 +5,6 @@ CC = g++
 CCLD=$(CC)
 bin_PROGRAMS=autotools_template
 autotools_template_SOURCES = main.c\
-		  kernel.h kernel.cu
+			     kernel.h kernel.cu
 autotools_template_CFLAGS  = $(CUDA_CFLAGS)
 autotools_template_LDADD  = $(CUDA_LIBS)
