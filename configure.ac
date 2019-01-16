@@ -36,15 +36,6 @@ AC_ARG_ENABLE([debug],
    esac],
    [DEBUG=false]
 )
-AC_ARG_ENABLE([emu],
-   [  --enable-emu    Turn on device emulation for CUDA],
-   [case "${enableval}" in
-       yes) EMULATION=true;;
-       no)  EMULATION=false;;
-       *) AC_MSG_ERROR([bad value ${enableval} for --enable-emu]);;
-   esac],
-   [EMULATION=false]
-)
 
 # ------------------------------------------------------------------------------
 # Setup nvcc flags
