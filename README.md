@@ -17,3 +17,5 @@ Basically it goes like this:
 * kernel.cu ==> cuda.h, curand_kernel.h (nvcc handles this)
 
 And the linking is done by g++ by using -lcudart
+
+Apart from this, everything is like a normal autotools project.
