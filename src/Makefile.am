@@ -3,8 +3,8 @@
 
 CC = g++
 CCLD=$(CC)
-bin_PROGRAMS=autotools_template
-autotools_template_SOURCES = main.c\
-			     kernel.h kernel.cu
-autotools_template_CFLAGS  = $(CUDA_CFLAGS)
-autotools_template_LDADD  = $(CUDA_LIBS)
+bin_PROGRAMS=cuAutotools
+cuAutotools_SOURCES = 	main.c\
+			kernel.h kernel.cu
+cuAutotools_CFLAGS  = $(CUDA_CFLAGS)
+cuAutotools_LDADD  = $(CUDA_LIBS)

@@ -1,6 +1,6 @@
 # ------------------------------------------------------------------------------
 AC_PREREQ([2.64])
-AC_INIT([autotools_template], [1.0], [minterciso@gmail.com])
+AC_INIT([cuAutotools], [1.0], [minterciso@gmail.com])
 AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([src/main.c])
 AC_CONFIG_HEADERS([config.h])
