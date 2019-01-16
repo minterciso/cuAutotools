@@ -25,7 +25,7 @@
  * @brief Starts the PRNG for each curandState with seed and a different starting id
  * @param state A pointer to a device memory containing an array of curandState values
  * @param seed The seed, this should be different on each execution
- * @qtd The size of the curandState array
+ * @param qtd The size of the state array
  */
 __global__ void setup_prng(curandState *state, unsigned long long seed, unsigned int qtd){
     const int tid = threadIdx.x + blockIdx.x*blockDim.x;
