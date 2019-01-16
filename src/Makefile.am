@@ -7,4 +7,4 @@ bin_PROGRAMS=cuAutotools
 cuAutotools_SOURCES = 	main.c\
 			kernel.h kernel.cu
 cuAutotools_CFLAGS  = $(CUDA_CFLAGS)
-cuAutotools_LDADD  = $(CUDA_LIBS)
+cuAutotools_LDADD  = $(CUDA_LIBS) -lcurand

@@ -13,12 +13,12 @@ AC_ARG_WITH([cuda],
 if test -n "$with_cuda"
 then
    CUDA_CFLAGS="-I$with_cuda/include"
-   CUDA_LIBS="-L$with_cuda/lib$ARCH -lcudart -lcurand"
+   CUDA_LIBS="-L$with_cuda/lib$ARCH -lcudart"
    NVCC="$with_cuda/bin/nvcc"
    CUDA_PATH="$with_cuda"
 else
    CUDA_CFLAGS="-I/usr/local/cuda/include"
-   CUDA_LIBS="-L/usr/local/cuda/lib$ARCH -lcudart -lcurand"
+   CUDA_LIBS="-L/usr/local/cuda/lib$ARCH -lcudart"
    NVCC="nvcc"
    CUDA_PATH="/usr/local/cuda/"
 fi
