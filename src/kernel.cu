@@ -21,12 +21,25 @@
 #include <cuda.h>
 #include <curand_kernel.h>
 
+/**
+ * @brief Starts the PRNG for each curandState with seed and a different starting id
+ * @param state A pointer to a device memory containing an array of curandState values
+ * @param seed The seed, this should be different on each execution
+ * @qtd The size of the curandState array
+ */
 __global__ void setup_prng(curandState *state, unsigned long long seed, unsigned int qtd){
     const int tid = threadIdx.x + blockIdx.x*blockDim.x;
     if(tid < qtd)
         curand_init(seed, tid, 0, &state[tid]);
 }
 
+/**
+ * @brief Create Random qtd_data random floats and store the average on the data array
+ * @param state The already initialized array of curandState states
+ * @param qtd_states The amount of states (this must be the same size of data)
+ * @param data A float array initialized on the GPU to store the results
+ * @param qtd_data How may samples we will create
+ */
 __global__ void create_random_data(curandState *state, unsigned int qtd_states, float *data, unsigned int qtd_data){
     const int tid = threadIdx.x + blockIdx.x*blockDim.x;
     if(tid < qtd_states){
@@ -46,13 +59,14 @@ __global__ void dummy_kernel(void){
 }
 
 int call_rand_kernel(void){
+    // Variables
     float *h_data, *d_data;
     curandState *d_state;
     unsigned int size = 1024*1024;
     unsigned int data_bytes = sizeof(float)*size;
     unsigned int state_bytes = sizeof(curandState)*size;
-    int numThreads = 512;
-    int numBlocks = size/numThreads + 1;
+    int numThreads = 512; // numThreads is an arbitrary value on this case
+    int numBlocks = size/numThreads + 1; // numBlocks however is the amount of blocks with numThreads we need to create all size data
 
     fprintf(stdout,"[*] Using kernel configuration %d, %d\n", numBlocks, numThreads);
     fprintf(stdout,"[*] Allocating memory for random kernel\n");
@@ -68,7 +82,7 @@ int call_rand_kernel(void){
     fprintf(stdout,"[*] Starting PRNG\n");
     unsigned long long seed = time(NULL);
     setup_prng<<<numBlocks, numThreads>>>(d_state, seed, size);
-    cudaError_t error = cudaDeviceSynchronize();
+    cudaError_t error = cudaDeviceSynchronize(); // We have to be sure we finished and we have no errors before continuing
     if(error != cudaSuccess){
         fprintf(stderr, "[E] Error: %s\n", cudaGetErrorName(error));
         return -1;
@@ -98,10 +112,11 @@ int call_rand_kernel(void){
 void call_dummy_kernel(void){
     fprintf(stdout,"[*] Calling Dummy kernel.\n");
     dummy_kernel<<<1, 1>>>();
-    cudaDeviceSynchronize();
+    cudaDeviceSynchronize(); // This is optional, but since we are just demoing...
 }
 
 void start_device(void){
+    // Select the first device, we could change this to select the BEST device on a Multi GPU system.
     int dev = 0;
     cudaDeviceProp device_properties;
     
