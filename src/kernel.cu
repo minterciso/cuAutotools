@@ -21,25 +21,12 @@
 #include <cuda.h>
 #include <curand_kernel.h>
 
-/**
- * @brief Starts the PRNG for each curandState with seed and a different starting id
- * @param state A pointer to a device memory containing an array of curandState values
- * @param seed The seed, this should be different on each execution
- * @param qtd The size of the state array
- */
 __global__ void setup_prng(curandState *state, unsigned long long seed, unsigned int qtd){
     const int tid = threadIdx.x + blockIdx.x*blockDim.x;
     if(tid < qtd)
         curand_init(seed, tid, 0, &state[tid]);
 }
 
-/**
- * @brief Create Random qtd_data random floats and store the average on the data array
- * @param state The already initialized array of curandState states
- * @param qtd_states The amount of states (this must be the same size of data)
- * @param data A float array initialized on the GPU to store the results
- * @param qtd_data How may samples we will create
- */
 __global__ void create_random_data(curandState *state, unsigned int qtd_states, float *data, unsigned int qtd_data){
     const int tid = threadIdx.x + blockIdx.x*blockDim.x;
     if(tid < qtd_states){
@@ -75,26 +62,18 @@ int call_rand_kernel(void){
         perror("malloc");
         return -1;
     }
-    cudaMalloc((void**)&d_data, data_bytes);
-    cudaMemset(d_data, 0, data_bytes);
+    CUDA_CALL(cudaMalloc((void**)&d_data, data_bytes));
+    CUDA_CALL(cudaMemset(d_data, 0, data_bytes));
     fprintf(stdout,"[*] Allocating PRNG state memory\n");
-    cudaMalloc((void**)&d_state, state_bytes);
+    CUDA_CALL(cudaMalloc((void**)&d_state, state_bytes));
     fprintf(stdout,"[*] Starting PRNG\n");
     unsigned long long seed = time(NULL);
     setup_prng<<<numBlocks, numThreads>>>(d_state, seed, size);
-    cudaError_t error = cudaDeviceSynchronize(); // We have to be sure we finished and we have no errors before continuing
-    if(error != cudaSuccess){
-        fprintf(stderr, "[E] Error: %s\n", cudaGetErrorName(error));
-        return -1;
-    }
+    CUDA_CALL(cudaDeviceSynchronize());
     fprintf(stdout,"[*] Creating random values\n");
     create_random_data<<<numBlocks, numThreads>>>(d_state, size, d_data, 1000);
-    error = cudaDeviceSynchronize();
-    if(error != cudaSuccess){
-        fprintf(stderr, "[E] Error: %s\n", cudaGetErrorName(error));
-        return -1;
-    }
-    cudaMemcpy(h_data, d_data, data_bytes, cudaMemcpyDeviceToHost);
+    CUDA_CALL(cudaDeviceSynchronize());
+    CUDA_CALL(cudaMemcpy(h_data, d_data, data_bytes, cudaMemcpyDeviceToHost));
     fprintf(stdout,"[*] Calculating mean values\n");
     float sum = 0.0;
     float mean = 0.0;
@@ -103,8 +82,8 @@ int call_rand_kernel(void){
     fprintf(stdout,"[*] Mean values = %.10f\n", mean);
 
     fprintf(stdout,"[*] Cleaning memory\n");
-    cudaFree(d_data);
-    cudaFree(d_state);
+    CUDA_CALL(cudaFree(d_data));
+    CUDA_CALL(cudaFree(d_state));
     free(h_data);
     return 0;
 }
@@ -112,7 +91,7 @@ int call_rand_kernel(void){
 void call_dummy_kernel(void){
     fprintf(stdout,"[*] Calling Dummy kernel.\n");
     dummy_kernel<<<1, 1>>>();
-    cudaDeviceSynchronize(); // This is optional, but since we are just demoing...
+    CUDA_CALL(cudaDeviceSynchronize()); // This is optional, but since we are just demoing...
 }
 
 void start_device(void){
@@ -120,13 +99,13 @@ void start_device(void){
     int dev = 0;
     cudaDeviceProp device_properties;
     
-    cudaGetDeviceProperties(&device_properties, dev);
+    CUDA_CALL(cudaGetDeviceProperties(&device_properties, dev));
 
     fprintf(stdout,"[*] Setting device %d: %s\n", dev, device_properties.name);
-    cudaSetDevice(dev);
+    CUDA_CALL(cudaSetDevice(dev));
 }
 
 void reset_device(void){
-    cudaDeviceReset();
+    CUDA_CALL(cudaDeviceReset());
 }
 
