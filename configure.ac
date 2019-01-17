@@ -27,24 +27,25 @@ AC_SUBST(CUDA_LIBS)
 AC_SUBST(NVCC)
 AC_SUBST(CUDA_PATH)
 
+DEBUG=false
 AC_ARG_ENABLE([debug],
-   [  --enable-debug    Turn on device debug for CUDA],
-   [case "${debugvall}" in
-       yes) DEBUG=true;;
-       no)  DEBUG=false;;
-       *) AC_MSG_ERROR([bad value ${debugval} for --enable-debug]);;
-   esac],
-   [DEBUG=false]
-)
+        AS_HELP_STRING([--enable-debug], [Turn on device debug]))
+AS_IF([test "x$enable_debug" == "xyes"], [
+        DEBUG=true
+        ])
 
 # ------------------------------------------------------------------------------
 # Setup nvcc flags
 # ------------------------------------------------------------------------------
-if test x$DEBUG = xtrue 
+if test x$DEBUG == xtrue 
 then
+   AC_MSG_NOTICE([Enabling DEBUG])
    NVCCFLAGS="-g -G"
+   CFLAGS="-g -ggdb"
 else
+   AC_MSG_NOTICE([Enabling Performance])
    NVCCFLAGS="-O3 -use_fast_math"
+   CFLAGS="-O3 -fexpensive-optimizations -use_fast_math"
 fi
 AC_SUBST(NVCCFLAGS)
 AC_SUBST(NVCC_CFLAGS)

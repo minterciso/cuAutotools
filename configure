@@ -1362,7 +1362,7 @@ Optional Features:
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --enable-silent-rules   less verbose build output (undo: "make V=1")
   --disable-silent-rules  verbose build output (undo: "make V=0")
-  --enable-debug    Turn on device debug for CUDA
+  --enable-debug          Turn on device debug
   --enable-dependency-tracking
                           do not reject slow dependency extractors
   --disable-dependency-tracking
@@ -2791,27 +2791,32 @@ fi
 
 
 
+DEBUG=false
 # Check whether --enable-debug was given.
 if test "${enable_debug+set}" = set; then :
-  enableval=$enable_debug; case "${debugvall}" in
-       yes) DEBUG=true;;
-       no)  DEBUG=false;;
-       *) as_fn_error $? "bad value ${debugval} for --enable-debug" "$LINENO" 5;;
-   esac
-else
-  DEBUG=false
-
+  enableval=$enable_debug;
 fi
 
+if test "x$enable_debug" == "xyes"; then :
+
+        DEBUG=true
+
+fi
 
 # ------------------------------------------------------------------------------
 # Setup nvcc flags
 # ------------------------------------------------------------------------------
-if test x$DEBUG = xtrue
+if test x$DEBUG == xtrue
 then
+   { $as_echo "$as_me:${as_lineno-$LINENO}: Enabling DEBUG" >&5
+$as_echo "$as_me: Enabling DEBUG" >&6;}
    NVCCFLAGS="-g -G"
+   CFLAGS="-g -ggdb"
 else
+   { $as_echo "$as_me:${as_lineno-$LINENO}: Enabling Performance" >&5
+$as_echo "$as_me: Enabling Performance" >&6;}
    NVCCFLAGS="-O3 -use_fast_math"
+   CFLAGS="-O3 -fexpensive-optimizations -use_fast_math"
 fi
 
 
